@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="首爾2027">
+<meta name="theme-color" content="#FBF6EC">
+<meta name="format-detection" content="telephone=no">
+<title>2027 首爾五天四夜</title>
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6EC; --paper:#FFFDF8; --tea:#B98B65; --tea-d:#8E6444; --tea-l:#EAD9C6;
+  --blue:#8FA9BF; --blue-d:#5E7C95; --blue-l:#DCE6EE; --ink:#4A3F36; --ink-l:#8A7D70;
+  --line:#E7DCCB; --rose:#D9A29A; --green:#8DAA8B; --shadow:0 4px 14px rgba(120,90,60,.10);
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:#EFE7D9; color:var(--ink);
+  font-family:"Noto Sans TC","Noto Sans KR",-apple-system,"PingFang TC","Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+#app{
+  max-width:480px; margin:0 auto; min-height:100vh; background:var(--cream);
+  position:relative; padding-top:var(--safe-t); padding-bottom:calc(86px + var(--safe-b));
+  background-image:radial-gradient(#E9DDC9 1px, transparent 1px); background-size:18px 18px;
+  box-shadow:0 0 30px rgba(120,90,60,.12);
+}
+h1,h2,h3{margin:0;font-family:"Noto Serif TC","Noto Sans TC",serif}
+.page{display:none;padding:0 16px 24px}
+.page.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Header */
+.hero{margin:14px 0 14px;padding:22px 18px 18px;background:var(--paper);border-radius:20px;box-shadow:var(--shadow);position:relative;border:1px solid var(--line)}
+.hero:before{content:"";position:absolute;top:-9px;left:30px;width:92px;height:22px;background:rgba(143,169,191,.55);transform:rotate(-3deg);border-radius:2px}
+.hero:after{content:"";position:absolute;top:-8px;right:26px;width:64px;height:20px;background:rgba(185,139,101,.45);transform:rotate(4deg);border-radius:2px}
+.hero .sub{font-size:12px;letter-spacing:2px;color:var(--tea-d);margin-bottom:4px}
+.hero h1{font-size:22px;line-height:1.3}
+.hero .dates{margin-top:6px;color:var(--ink-l);font-size:13px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{background:var(--blue-l);color:var(--blue-d);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:500}
+.chip.tea{background:var(--tea-l);color:var(--tea-d)}
+
+/* Cards */
+.card{background:var(--paper);border-radius:18px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.card h2{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.muted{color:var(--ink-l);font-size:13px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.btn{border:none;background:var(--tea);color:#fff;border-radius:12px;padding:9px 14px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;transition:.15s}
+.btn:active{transform:scale(.97);opacity:.9}
+.btn.blue{background:var(--blue-d)}
+.btn.ghost{background:transparent;color:var(--tea-d);border:1px solid var(--tea-l)}
+.btn.sm{padding:5px 11px;font-size:12.5px;border-radius:10px}
+input,select{font-family:inherit;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;width:100%;outline:none}
+input:focus,select:focus{border-color:var(--blue)}
+label.f{display:block;font-size:12px;color:var(--ink-l);margin:8px 0 3px}
+
+/* Weather */
+.weather .temp{font-size:34px;font-family:"Noto Serif TC",serif;font-weight:700;line-height:1}
+.weather .big{font-size:38px}
+.advice{margin-top:10px;background:var(--blue-l);border-radius:12px;padding:10px 12px;font-size:13.5px;color:#3F5A70}
+.jan{margin-top:8px;font-size:12.5px;color:var(--ink-l)}
+
+/* Info rows */
+.info{display:flex;gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
+.info:first-of-type{border-top:none}
+.info .ic{font-size:20px;width:26px;text-align:center}
+.info b{font-weight:700}
+.ko{font-family:"Noto Sans KR",sans-serif}
+
+/* Day pills */
+.pills{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin:0 -2px;scrollbar-width:none;position:sticky;top:0;z-index:5;background:linear-gradient(var(--cream) 80%,transparent)}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;border:1.5px solid var(--tea-l);background:var(--paper);color:var(--tea-d);border-radius:16px;padding:6px 14px;text-align:center;font-family:inherit;cursor:pointer;min-width:66px}
+.pill b{display:block;font-size:14px}
+.pill span{font-size:11px;opacity:.85}
+.pill.active{background:var(--tea);border-color:var(--tea);color:#fff;box-shadow:0 3px 8px rgba(185,139,101,.4)}
+.daytitle{margin:4px 2px 12px}
+.daytitle h2{font-size:18px}
+.daytitle p{margin:2px 0 0;font-size:13px;color:var(--ink-l)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:26px}
+.timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;border-left:2px dashed var(--tea-l)}
+.tl-item{position:relative;margin-bottom:14px}
+.dot{position:absolute;left:-26px;top:14px;width:18px;height:18px;border-radius:50%;background:var(--paper);border:2.5px solid var(--tea);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;z-index:1}
+.tl-item.done .dot{background:var(--green);border-color:var(--green)}
+.tl-item.done .tl-card{opacity:.6}
+.tl-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+.tl-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.time{font-family:"Noto Serif TC",serif;font-weight:700;color:var(--tea-d);font-size:15px}
+.tag{font-size:11.5px;padding:2px 10px;border-radius:999px;font-weight:500}
+.tag.food{background:#F6DCD6;color:#A4574B}
+.tag.shop{background:#E3E9F1;color:#4F6A86}
+.tag.exp{background:#E4EBDD;color:#5E7A58}
+.tag.trans{background:#EFE3CF;color:#8A6A3C}
+.tl-card h3{font-size:16.5px;line-height:1.35}
+.tl-card h3 small{display:block;font-size:13px;font-weight:400;color:var(--ink-l);font-family:"Noto Sans TC",sans-serif;margin-top:1px}
+.hl{margin:8px 0 4px;font-size:13.5px;background:#FBF0DE;border-radius:10px;padding:6px 10px}
+.tr{margin:4px 0 8px;font-size:13px;color:var(--ink-l)}
+.navbtn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#03C75A;color:#fff;font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:10px}
+.navbtn:active{opacity:.85}
+.note-box{font-size:12px;color:var(--ink-l);margin:6px 2px 14px;text-align:center}
+
+/* Lists */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{flex:0 0 auto;border:1.5px solid var(--blue-l);background:var(--paper);color:var(--blue-d);border-radius:999px;padding:5px 14px;font-size:13px;font-family:inherit;cursor:pointer}
+.fbtn.active{background:var(--blue-d);border-color:var(--blue-d);color:#fff}
+.progress{height:8px;background:var(--tea-l);border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--tea),var(--blue));width:0;transition:.3s}
+.ck{display:flex;align-items:flex-start;gap:12px;padding:11px 4px;border-bottom:1px dashed var(--line)}
+.ck:last-child{border-bottom:none}
+.ck input[type=checkbox]{appearance:none;-webkit-appearance:none;width:22px;height:22px;flex:0 0 22px;border:2px solid var(--tea);border-radius:7px;padding:0;margin-top:1px;background:#fff;cursor:pointer;position:relative}
+.ck input[type=checkbox]:checked{background:var(--tea)}
+.ck input[type=checkbox]:checked:after{content:"✓";color:#fff;position:absolute;inset:0;text-align:center;font-size:14px;line-height:19px}
+.ck .t{flex:1;min-width:0}
+.ck .t b{font-weight:500}
+.ck.done .t b{text-decoration:line-through;color:var(--ink-l)}
+.ck .t small{display:block;color:var(--ink-l);font-size:12.5px}
+.ck .x{border:none;background:none;color:#C9B9A5;font-size:18px;cursor:pointer;padding:0 4px}
+.mini{font-size:10.5px;padding:1px 8px;border-radius:99px;background:var(--blue-l);color:var(--blue-d);margin-left:6px;vertical-align:middle}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.addrow input{flex:1}
+.addrow select{width:auto;max-width:120px}
+
+/* Phrases */
+.phrases{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ph{background:#FFF;border:1.5px solid var(--tea-l);border-radius:14px;padding:10px 12px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
+.ph:active{background:var(--tea-l)}
+.ph .z{font-size:13px;color:var(--tea-d);font-weight:500}
+.ph .k{font-family:"Noto Sans KR",sans-serif;font-size:14px;margin-top:2px}
+.overlay{position:fixed;inset:0;background:var(--cream);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;cursor:pointer}
+.overlay.show{display:flex}
+.overlay .oz{font-size:18px;color:var(--tea-d);margin-bottom:22px}
+.overlay .ok{font-family:"Noto Sans KR",sans-serif;font-size:42px;font-weight:700;line-height:1.35;word-break:keep-all}
+.overlay .or{margin-top:20px;color:var(--ink-l);font-size:15px}
+.overlay .oh{position:absolute;bottom:calc(30px + var(--safe-b));font-size:12px;color:var(--ink-l)}
+
+/* Converter */
+.conv{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end}
+.swap{width:40px;height:40px;border-radius:50%;border:none;background:var(--blue-l);color:var(--blue-d);font-size:18px;cursor:pointer;margin-bottom:0}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;font-size:12px;text-align:center}
+.quick div{background:#FBF0DE;border-radius:10px;padding:6px 2px}
+.quick b{display:block;color:var(--tea-d)}
+
+/* Split */
+.seg{display:flex;background:var(--tea-l);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:none;background:transparent;border-radius:10px;padding:8px;font-family:inherit;font-size:14px;color:var(--tea-d);cursor:pointer}
+.seg button.on{background:var(--tea);color:#fff;font-weight:500}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.sum div{background:#FBF0DE;border-radius:12px;padding:8px 10px}
+.sum small{display:block;color:var(--ink-l);font-size:11.5px}
+.sum b{font-size:16px}
+.settle{margin-top:6px;padding:12px;border-radius:14px;background:var(--blue-l);color:#3A556B;text-align:center;font-weight:500}
+.settle .big2{font-family:"Noto Serif TC",serif;font-size:20px;font-weight:700;margin-top:2px}
+.exp-item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed var(--line)}
+.exp-item:last-child{border:none}
+.badge{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--tea-l);color:var(--tea-d)}
+.badge.p{background:var(--blue-l);color:var(--blue-d)}
+
+.seg.multi{flex-wrap:wrap}
+.seg button{white-space:nowrap}
+.perperson{margin-top:10px;display:grid;gap:8px}
+.pp{background:#FBF0DE;border-radius:12px;padding:8px 12px;display:grid;grid-template-columns:1fr auto;column-gap:8px}
+.pp b{font-size:15px}
+.pp span{grid-column:1;font-size:11.5px;color:var(--ink-l)}
+.pp em{grid-column:2;grid-row:1 / span 2;align-self:center;font-style:normal;font-weight:700;font-size:14px;color:var(--ink-l)}
+.pp em.pos{color:#5E7A58}
+.pp em.neg{color:#A4574B}
+.pay{margin:6px 0 10px}
+.pay:last-child{margin-bottom:0}
+
+/* Tab bar */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:50;background:rgba(255,253,248,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + var(--safe-b))}
+.tab{flex:1;border:none;background:none;font-family:inherit;color:var(--ink-l);padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:11px;border-radius:12px}
+.tab .i{font-size:21px;line-height:1.2;filter:grayscale(.6);opacity:.75}
+.tab.active{color:var(--tea-d);font-weight:700}
+.tab.active .i{filter:none;opacity:1;transform:translateY(-1px)}
+.toast{position:fixed;left:50%;bottom:calc(100px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:200;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.empty{text-align:center;color:var(--ink-l);padding:18px 0;font-size:13.5px}
+/* ===== v2 新增 ===== */
+.dt{margin:8px 0 6px;background:#F7F1E6;border-radius:12px;border:1px solid var(--line)}
+.dt summary{cursor:pointer;padding:8px 12px;font-size:13px;color:var(--tea-d);font-weight:500;list-style:none}
+.dt summary::-webkit-details-marker{display:none}
+.dt summary:after{content:"＋";float:right}
+.dt[open] summary:after{content:"－"}
+.dtb{padding:0 12px 10px;font-size:13px}
+.dtb p{margin:6px 0}
+.dtb ul{margin:4px 0 0;padding-left:18px}
+.vf{font-size:11.5px;color:var(--ink-l)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.navbtn.gbtn{background:#4285F4}
+.dbtn{margin-left:auto;border:1px solid var(--line);background:none;color:#A4574B;border-radius:10px;padding:5px 10px;font-size:12.5px;font-family:inherit;cursor:pointer}
+.dayact{display:flex;gap:8px;margin:2px 0 8px}
+.mod{position:fixed;inset:0;background:rgba(74,63,54,.45);z-index:150;display:none;align-items:flex-end;justify-content:center}
+.mod.show{display:flex}
+.sheet{width:100%;max-width:480px;background:var(--paper);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + var(--safe-b))}
+.sheet h3{font-size:18px;margin-bottom:4px}
+textarea{font-family:inherit;font-size:15px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;width:100%;outline:none;resize:vertical}
+textarea:focus{border-color:var(--blue)}
+.sheet{max-height:90vh;overflow-y:auto}
+.hl,.tr,.dtb p,.dtb li,.ck .t small{white-space:pre-line;word-break:break-word}
+.dbtn+.dbtn{margin-left:0}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== 行程總覽 ===== -->
+  <section class="page active" id="p-trip">
+    <div class="hero">
+      <div class="sub">SEOUL · 서울 · 2027</div>
+      <h1>2027 首爾五天四夜三人自由行</h1>
+      <div class="dates">2027/01/11（一）～ 01/15（五）</div>
+      <div class="chips"><span class="chip" id="countdown">倒數計算中…</span><span class="chip tea">三人行 ♡</span></div>
+    </div>
+
+    <div class="card weather">
+      <h2>🌤️ 首爾天氣 &amp; 穿搭提醒</h2>
+      <div class="row" style="gap:14px">
+        <div class="big" id="wIcon">⛅</div>
+        <div class="grow">
+          <div class="temp" id="wTemp">--°C</div>
+          <div class="muted" id="wDesc">載入首爾目前天氣中…</div>
+        </div>
+      </div>
+      <div class="advice" id="wAdvice">🧣 1 月首爾平均約 -7～2°C，體感常在 -10°C 以下：請準備發熱衣＋毛衣＋長版羽絨外套、毛帽、手套、圍巾、防滑短靴。</div>
+      <div class="jan">＊顯示的是「目前」首爾即時氣溫（行程 2 週內會更貼近旅程）。室內暖氣很強，洋蔥式穿法最方便；腳底與手指記得貼暖暖包。</div>
+    </div>
+
+    <div class="card">
+      <h2>✈️ 航班資訊</h2>
+      <div class="info"><div class="ic">🛫</div><div><b>去程 OZ714</b>｜1/11（一）<br>17:05 桃園 T1 → 20:30 仁川 T2</div></div>
+      <div class="info"><div class="ic">🛬</div><div><b>回程 OZ713</b>｜1/15（五）<br>13:50 仁川 T2 → 15:55 桃園 T1</div></div>
+    </div>
+
+    <div class="card">
+      <h2>🏠 住宿資訊</h2>
+      <div class="info"><div class="ic">🛏️</div>
+        <div class="grow"><b class="ko">아뜰리에8 동묘3</b><br>Atelier 8 東廟 3
+          <div class="muted" style="margin-top:4px">📍 東廟站（1 號線＆6 號線交會）步行約 2～3 分鐘<br>鄰近東大門、DDP、Olive Young、SPAREX 汗蒸幕</div>
+        </div>
+      </div>
+      <div style="margin-top:6px">
+        <label class="f">韓文地址（可貼上訂房確認信的完整地址，會自動儲存）</label>
+        <input id="addrInput" class="ko" placeholder="例：서울특별시 종로구 …">
+      </div>
+      <div class="row" style="margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="copyAddr">📋 一鍵複製韓文地址</button>
+        <a class="navbtn" id="hotelNav" target="_blank" rel="noopener">NAVER Map</a>
+      </div>
+    </div>
+
+    <div class="pills" id="pills"></div>
+    <div class="daytitle" id="dayTitle"></div>
+    <div class="timeline" id="timeline"></div>
+    <div class="dayact"><button class="btn blue" style="flex:1" id="addItem">＋ 新增行程</button><button class="btn ghost" id="editDay">✏️ 標題</button><button class="btn ghost" id="resetDay">清空本日</button></div>
+    <div class="note-box">⚠️ 地鐵出口與營業時間請以 NAVER Map 當日資訊為準，冬季部分店家可能公休或調整時間。<br>點時間軸圓點可標記「已完成」。</div>
+  </section>
+
+  <!-- ===== 美食＆購物清單 ===== -->
+  <section class="page" id="p-list">
+    <div class="hero" style="margin-bottom:10px">
+      <div class="sub">FOOD &amp; SHOPPING</div>
+      <h1>美食＆購物清單 🛍️</h1>
+      <div class="muted">三人各自一份清單，點上方名字切換</div>
+      <div class="progress"><i id="shopBar"></i></div>
+      <div class="muted" id="shopCount"></div>
+    </div>
+    <div class="seg" id="shopWho" style="margin-bottom:10px"></div>
+    <div class="filters" id="shopFilters"></div>
+    <div class="card" style="padding:6px 14px"><div id="shopList"></div></div>
+    <div class="card">
+      <h2>➕ 新增項目</h2>
+      <div class="addrow">
+        <input id="shopNew" placeholder="例：潤唇膏、辣炒年糕…">
+        <select id="shopCat"></select>
+      </div>
+      <input id="shopNote" placeholder="備註（店家、價格、色號…，可空白）" style="margin-top:8px">
+      <button class="btn blue" style="margin-top:10px;width:100%" id="shopAdd">加入清單</button>
+    </div>
+  </section>
+
+  <!-- ===== 行前準備＆備忘 ===== -->
+  <section class="page" id="p-prep">
+    <div class="hero" style="margin-bottom:10px">
+      <div class="sub">BEFORE YOU GO</div>
+      <h1>行前準備＆備忘 🧳</h1>
+      <div class="progress"><i id="prepBar"></i></div>
+      <div class="muted" id="prepCount"></div>
+    </div>
+    <div class="card" style="padding:6px 14px"><div id="prepList"></div></div>
+
+    <div class="card">
+      <h2>💱 韓元 ⇄ 台幣 換算機</h2>
+      <div class="conv">
+        <div><label class="f">韓元 KRW ₩</label><input id="cvKrw" type="number" inputmode="decimal" placeholder="0"></div>
+        <button class="swap" id="cvSwap" title="清除">⇄</button>
+        <div><label class="f">台幣 TWD NT$</label><input id="cvTwd" type="number" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <label class="f">匯率：1 台幣 ＝ ? 韓元（可自訂）</label>
+      <div class="row">
+        <input id="rateInput" type="number" inputmode="decimal" step="0.01">
+        <button class="btn sm blue" id="rateFetch" style="white-space:nowrap">抓即時匯率</button>
+      </div>
+      <div class="muted" id="rateMsg" style="margin-top:6px"></div>
+      <div class="quick" id="quick"></div>
+    </div>
+
+    <div class="card">
+      <h2>🗣️ 韓文指路 / 點餐手指卡</h2>
+      <div class="muted" style="margin-bottom:10px">點一下卡片 → 全螢幕放大，直接給店員或司機看。</div>
+      <div class="phrases" id="phrases"></div>
+    </div>
+  </section>
+
+  <!-- ===== 行李清單 ===== -->
+  <section class="page" id="p-pack">
+    <div class="hero" style="margin-bottom:10px">
+      <div class="sub">PACKING LIST</div>
+      <h1>行李清單 🎒</h1>
+      <div class="progress"><i id="packBar"></i></div>
+      <div class="muted" id="packCount"></div>
+    </div>
+    <a class="navbtn" style="background:#2F2F2F;margin-bottom:10px" href="https://global-pike-937.notion.site/3194d45bd48580989c1ada34de57074f?source=copy_link" target="_blank" rel="noopener">📎 開啟我的 Notion 行李清單</a>
+    <div class="filters" id="packFilters"></div>
+    <div class="card" style="padding:6px 14px"><div id="packList"></div></div>
+    <div class="card">
+      <h2>➕ 新增物品</h2>
+      <div class="addrow"><input id="packNew" placeholder="例：保溫瓶"><select id="packCat"></select></div>
+      <div class="row" style="margin-top:10px"><button class="btn blue grow" id="packAdd">加入清單</button><button class="btn ghost" id="packReset">重置勾選</button></div>
+    </div>
+    <div class="note-box">✈️ 液體 ≤100ml 且裝夾鏈袋；行動電源／鋰電池須隨身手提（≤100Wh）。托運與手提額度請依航空公司規定。</div>
+  </section>
+
+  <!-- ===== 三人分帳 ===== -->
+  <section class="page" id="p-split">
+    <div class="hero" style="margin-bottom:10px">
+      <div class="sub">SPLIT THE BILL</div>
+      <h1>三人分帳記帳 💰</h1>
+      <div class="muted" style="margin-top:4px">璇・李實驗・黃益聞｜記錄誰先付、幫誰付，自動算出最終誰給誰多少，匯率沿用「行前準備」設定</div>
+    </div>
+
+    <div class="card">
+      <h2>🧾 最終結算</h2>
+      <div class="sum">
+        <div><small>總花費（台幣）</small><b id="sTotTwd">NT$0</b></div>
+        <div><small>總花費（韓元）</small><b id="sTotKrw">₩0</b></div>
+      </div>
+      <div class="settle" id="settle">還沒有支出</div>
+      <div id="perPerson" class="perperson"></div>
+    </div>
+
+    <div class="card">
+      <h2>➕ 新增支出</h2>
+      <label class="f">項目</label>
+      <input id="exDesc" placeholder="例：聖水洞咖啡、地鐵、午餐…">
+      <div class="row" style="margin-top:2px">
+        <div class="grow"><label class="f">金額</label><input id="exAmt" type="number" inputmode="decimal" placeholder="0"></div>
+        <div style="width:110px"><label class="f">幣別</label>
+          <select id="exCur"><option value="KRW">韓元 ₩</option><option value="TWD">台幣 NT$</option></select></div>
+      </div>
+      <label class="f">誰先付錢</label>
+      <div class="seg" id="exPayer"></div>
+      <label class="f">幫誰付／誰要分攤（可複選，預設三人平分）</label>
+      <div class="seg multi" id="exShare"></div>
+      <div class="muted" style="margin-top:6px">例：璇先幫李實驗付 → 付款人選「璇」，分攤只選「李實驗」。</div>
+      <button class="btn" style="margin-top:12px;width:100%" id="exAdd">新增支出</button>
+    </div>
+
+    <div class="card">
+      <div class="row between"><h2 style="margin:0">📒 支出明細</h2><button class="btn ghost sm" id="exClear">全部清除</button></div>
+      <div id="exList"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="oz" id="oz"></div><div class="ok" id="ok"></div><div class="or" id="or"></div>
+  <div class="oh">輕觸任意處關閉</div>
+</div>
+<div class="mod" id="modal"><div class="sheet">
+  <h3 id="mTitle">新增行程</h3>
+  <div class="muted">只有「時間」和「名稱」必填，其他可空白；填越多，行程卡越完整。</div>
+  <label class="f">時間 *</label><input id="mTime" type="time">
+  <label class="f">類別</label>
+  <select id="mCat"><option value="exp">體驗</option><option value="food">美食</option><option value="shop">逛街</option><option value="trans">交通</option></select>
+  <label class="f">地點／活動名稱 *（卡片大標題）</label><input id="mName" placeholder="例：어니언 성수">
+  <label class="f">中文名稱／副標題</label><input id="mZh" placeholder="例：Onion 聖水（麵包咖啡廳）">
+  <label class="f">重點／必點／必買</label><textarea id="mHl" rows="2" placeholder="例：必點 팡도르＋拿鐵，早點到避開人潮"></textarea>
+  <label class="f">交通方式</label><textarea id="mTr" rows="2" placeholder="例：聖水站 2 號出口步行約 5 分"></textarea>
+  <label class="f">營業時間</label><input id="mHours" placeholder="例：週一～五 08:00–22:00">
+  <label class="f">地址</label><input id="mAddr" placeholder="例：서울 성동구 아차산로9길 8">
+  <label class="f">菜單／清單（一行一項）</label><textarea id="mMenu" rows="3" placeholder="팡도르 ₩5,500&#10;소금빵 ₩3,800"></textarea>
+  <label class="f">簡介／備註</label><textarea id="mNote" rows="2" placeholder="例：已預約 18:00、要帶護照"></textarea>
+  <label class="f">地圖搜尋關鍵字（可空白，預設用名稱；韓文更準）</label><input id="mQ">
+  <div class="row" style="margin-top:14px"><button class="btn ghost grow" id="mCancel">取消</button><button class="btn grow" id="mOk">加入行程</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<nav class="tabbar">
+  <button class="tab active" data-p="p-trip"><span class="i">🗓️</span>行程總覽</button>
+  <button class="tab" data-p="p-list"><span class="i">🍜</span>美食購物</button>
+  <button class="tab" data-p="p-prep"><span class="i">🧳</span>行前備忘</button>
+  <button class="tab" data-p="p-pack"><span class="i">🎒</span>行李清單</button>
+  <button class="tab" data-p="p-split"><span class="i">💰</span>分帳記帳</button>
+</nav>
+
+<script>
+/* ---------- 小工具 ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('seoul27_'+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('seoul27_'+k, JSON.stringify(v)); }catch(e){} }
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const fmt = (n, d=0) => Number(n).toLocaleString('en-US', {maximumFractionDigits:d, minimumFractionDigits:d});
+let toastTimer;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 1800); }
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text).then(()=>true).catch(()=>fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+function fallbackCopy(text){
+  try{
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+    const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+  }catch(e){ return false; }
+}
+const naverUrl = q => 'https://map.naver.com/p/search/' + encodeURIComponent(q);
+
+/* ---------- 主畫面圖示（iOS 加入主畫面） ---------- */
+(function makeIcon(){
+  try{
+    const c = document.createElement('canvas'); c.width = c.height = 180; const x = c.getContext('2d');
+    x.fillStyle = '#FBF6EC'; x.fillRect(0,0,180,180);
+    x.fillStyle = '#B98B65'; x.fillRect(0,0,180,14);
+    x.fillStyle = '#8FA9BF'; x.beginPath(); x.arc(90,92,58,0,Math.PI*2); x.fill();
+    x.fillStyle = '#fff'; x.font = 'bold 54px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('서울', 90, 90);
+    x.fillStyle = '#8E6444'; x.font = 'bold 20px sans-serif'; x.fillText('2027', 90, 158);
+    $('#touchIcon').href = c.toDataURL('image/png');
+  }catch(e){}
+})();
+
+/* ---------- Tab 切換 ---------- */
+$$('.tab').forEach(b => b.addEventListener('click', () => {
+  $$('.tab').forEach(t => t.classList.toggle('active', t === b));
+  $$('.page').forEach(p => p.classList.toggle('active', p.id === b.dataset.p));
+  window.scrollTo({top:0});
+  store.set('tab', b.dataset.p);
+}));
+
+/* ---------- 倒數 ---------- */
+(function(){
+  const start = new Date(2027,0,11), end = new Date(2027,0,15), now = new Date();
+  const d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.round((start - d0) / 86400000);
+  let t;
+  if(diff > 0) t = `⏳ 還有 ${diff} 天出發`;
+  else if(d0 <= end) t = `🎉 旅行進行中！Day ${Math.round((d0-start)/86400000)+1}`;
+  else t = '✨ 旅程完成，滿滿回憶';
+  $('#countdown').textContent = t;
+})();
+
+/* ---------- 天氣（Open-Meteo，無需金鑰） ---------- */
+const WCODE = c => c===0?['☀️','晴朗']:c<=2?['🌤️','晴時多雲']:c===3?['☁️','陰天']:c<=48?['🌫️','有霧']:c<=57?['🌦️','毛毛雨']:c<=67?['🌧️','下雨']:c<=77?['❄️','下雪']:c<=82?['🌧️','陣雨']:c<=86?['🌨️','陣雪']:['⛈️','雷雨'];
+function dressAdvice(t){
+  if(t <= -8) return '🥶 極寒！發熱衣＋毛衣＋長版厚羽絨＋毛帽手套圍巾，暖暖包貼身、鞋底防滑。';
+  if(t <= -2) return '🧥 很冷：發熱衣＋毛衣＋羽絨外套，圍巾手套不可少，室內暖氣強記得可脫層。';
+  if(t <= 4)  return '🧣 偏冷：發熱衣＋針織＋厚外套，早晚風大建議加圍巾。';
+  if(t <= 10) return '🧶 微涼：針織＋大衣或薄羽絨，洋蔥式穿搭最方便。';
+  return '🌿 溫和：長袖＋薄外套即可（但 1 月旅程仍請依當時預報準備厚外套）。';
+}
+fetch('https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m,apparent_temperature,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FSeoul&forecast_days=1')
+  .then(r => r.json()).then(d => {
+    const c = d.current, [ic, ds] = WCODE(c.weather_code);
+    $('#wIcon').textContent = ic;
+    $('#wTemp').textContent = Math.round(c.temperature_2m) + '°C';
+    $('#wDesc').textContent = `${ds}｜體感 ${Math.round(c.apparent_temperature)}°C｜今日 ${Math.round(d.daily.temperature_2m_min[0])}～${Math.round(d.daily.temperature_2m_max[0])}°C`;
+    $('#wAdvice').textContent = dressAdvice(c.apparent_temperature) + '（旅程為 1 月，平均約 -7～2°C）';
+  }).catch(() => { $('#wDesc').textContent = '無法取得即時天氣（離線中），以下為 1 月平均參考'; });
+
+/* ---------- 行程資料 ---------- */
+const DAYS0 = [
+ {d:'1/11', w:'一', title:'Day 1', sub:'點下方「＋ 新增行程」開始規劃', items:[]},
+ {d:'1/12', w:'二', title:'Day 2', sub:'點下方「＋ 新增行程」開始規劃', items:[]},
+ {d:'1/13', w:'三', title:'Day 3', sub:'點下方「＋ 新增行程」開始規劃', items:[]},
+ {d:'1/14', w:'四', title:'Day 4', sub:'點下方「＋ 新增行程」開始規劃', items:[]},
+ {d:'1/15', w:'五', title:'Day 5', sub:'點下方「＋ 新增行程」開始規劃', items:[]}
+];
+const CAT = {food:'美食', shop:'逛街', exp:'體驗', trans:'交通'};
+/* ---------- 行程資料：可新增／刪除（存在手機瀏覽器） ---------- */
+DAYS0.forEach((D,i) => D.items.forEach((it,j) => it.id = 's'+i+'_'+j));
+let DAYS = store.get('days3', null) || JSON.parse(JSON.stringify(DAYS0));
+const saveDays = () => store.set('days3', DAYS);
+
+/* ---------- 店家資料庫（v:1＝營業時間已與公開資料交叉查證；其餘為參考） ---------- */
+const PLACE = {
+'어니언 성수':{a:'서울 성동구 아차산로9길 8（聖水站 2 號出口步行約 5 分）',h:'週一～五 08:00–22:00｜週末／假日 10:00–22:00（最後點餐 21:30）',m:['팡도르 Pandoro（粉糖圓頂麵包，招牌）','소금빵 鹽可頌、各式可頌','아보카도 명란 바게트（酪梨明太子法棍）','拿鐵、美式、胡蘿蔔汁、抹茶拿鐵'],i:'工廠改建的挑高工業風麵包咖啡廳，聖水洞代表店。週末人潮多，建議平日開店時段去。',v:1},
+'명동교자 본점':{a:'서울 중구 명동10길 29（明洞站 8 號出口步行約 3 分）',h:'約 10:30–21:00（最後點餐約 20:30）；各來源略有差異，春節／中秋公休',m:['칼국수 刀削麵（約 ₩12,000，雞骨高湯＋小水餃）','만두 餃子（約 ₩13,000）','비빔국수 拌麵（約 ₩12,000）','콩국수 豆漿冷麵（季節限定）'],i:'1966 年創業的米其林必比登名店，菜單只有四樣；蒜味泡菜可無限續。附近還有分店，排隊太長可換另一間。',v:1},
+'연남서서갈비':{h:'約中午起營業，肉賣完即打烊（常在 15:00–16:00 前售完），建議 12:00 前後入座',m:['양념갈비 醃製牛小排（以「一支骨」計價）','建議每人約 1.5～2 支骨','飯與泡菜可能需另購'],i:'「站著烤、站著吃」的老店，炭火煙大、衣服會沾味。分店很多，且有評論提到相關店家搬到明洞（명동7가길 20-8），請務必用 NAVER 確認要去的那一間地址與營業狀態。'},
+'레이어드 연남':{h:'約 09:00–21:00（參考）',m:['스콘 司康（多種口味）','咖啡、拿鐵','季節限定飲品與甜點'],i:'延南洞人氣司康咖啡廳，適合早午餐；週末可能排隊。'},
+'성수 연무장길':{h:'店家各異，約 11:00–20:00（部分店週一公休）',i:'聖水洞核心街區，潮牌旗艦店、快閃店與選物店集中，冬天多進店取暖。'},
+'성수연방':{a:'서울 성동구 성수이로14길 14',h:'各店不同，約 11:00–21:00（參考）',m:['多家餐飲＋選物店進駐，可挑輕食、甜點或小吃','建議先逛一圈再決定吃什麼'],i:'舊工廠改建的複合空間，一次逛完美食與雜貨。'},
+'대림창고':{a:'서울 성동구 성수이로 78',h:'約 11:00–22:00（參考）',m:['咖啡、拿鐵','蛋糕與甜點'],i:'倉庫改建的挑高紅磚工業風咖啡廳，被視為聖水洞咖啡廳風潮的起點之一。'},
+'신당동 떡볶이타운':{a:'서울 중구 다산로33길（新堂站 8 號出口附近）',h:'多數約 10:00–22:00（各店不同）',m:['즉석떡볶이 現煮辣炒年糕（鍋裝，桌邊自己煮）','라면사리 加泡麵、당면 冬粉','튀김 炸物、순대 血腸','볶음밥 收尾炒飯'],i:'一鍋現煮、可自由加料的辣炒年糕街，通常 2 人份起點。'},
+'경의선숲길':{h:'戶外公園全天開放；沿線店家多在 11:00–12:00 後營業',i:'舊鐵道改建的林蔭步道，兩旁小店與咖啡廳林立；冬天建議買熱飲邊走邊逛。'},
+'홍대 걷고싶은거리':{h:'街邊店約 12:00–22:00；街頭表演多在傍晚後',m:['호떡 糖餅','계란빵 雞蛋糕','닭꼬치 雞肉串'],i:'弘大購物與街頭表演區，Olive Young、服飾與配件小店密集。'},
+'한신포차 홍대':{h:'約 17:00–翌 02:00（參考，依分店）',m:['해물파전 海鮮煎餅','계란말이 厚蛋捲','닭발 辣雞爪、오돌뼈 脆骨','어묵탕 魚板湯','소주、막걸리'],i:'布帳馬車風格的下酒菜居酒屋，偏晚營業；週末晚上可能候位。'},
+'롯데백화점 본점':{a:'서울 중구 남대문로 81（乙支路入口站 7 號出口）',h:'約 10:30–20:00（週五～日常延至 20:30）；每月約有 1 個週一公休（1/14 為週四，一般營業）',i:'1F 美妝專櫃集中。外籍旅客可辦理退稅（택스리펀），攜帶護照；結帳前先說要退稅。'},
+'올리브영 명동 플래그십':{a:'서울 중구 명동길 53',h:'約 10:00–22:00（參考）',i:'明洞旗艦店，設有外籍旅客退稅櫃台（需護照）；免稅／即時退稅額度以現場公告為準。'},
+'다이소 명동역점':{h:'約 10:00–22:00（參考）',i:'文具、廚房收納、美妝小物，多為 ₩1,000～₩5,000 價位，適合買伴手禮。'},
+'배스킨라빈스 명동':{h:'約 10:00–23:00（依分店）',m:['多種口味可組盒（Pint／Quart／Family）','季節限定口味'],i:'明洞街上有多家分店，用 NAVER 找最近的一間。'},
+'동대문 닭한마리 골목':{a:'서울 종로구 종로40가길（東大門站附近）',h:'多數約 10:30–24:00（各店不同）',m:['닭한마리 一隻雞（約 ₩25,000–35,000，約 2～3 人）','칼국수사리 刀削麵、떡사리 年糕、수제비','自己調沾醬：醬油＋辣椒粉＋蒜泥＋醋'],i:'雞肉火鍋巷，湯底清爽、沾醬自己調。'},
+'동대문디자인플라자':{a:'서울 중구 을지로 281',h:'外部廣場全天開放；室內展覽與設計商店約 10:00–19:00（各展不同）',i:'曲面建築與夜間燈光為看點；冬季戶外風大，建議短暫停留拍照。'},
+'스파렉스 동대문':{h:'請用 NAVER 確認當日營業時段與入場費',m:['汗蒸幕＋大浴場（入場費以現場公告為準）','常見附設：簡餐、冰品、煮蛋'],i:'大型汗蒸幕與浴場；請自備換洗衣物，入場時確認浴巾／汗蒸服是否提供。'},
+'이삭토스트 동묘':{h:'約 07:00–（各分店不同）',m:['햄치즈 토스트 火腿起司吐司（約 ₩3,500–4,500）','베이컨／불고기 等其他口味','熱飲、汽水'],i:'現做的甜鹹吐司，外帶最方便。'},
+'GS25 동묘앞':{h:'24 小時',m:['삼각김밥、도시락','바나나우유','컵라면（店內有熱水可泡）','冬季熱食：핫바、호빵'],i:'飯店周邊的便利商店，宵夜與隔天早餐補給。'},
+'인천국제공항 제2터미널':{h:'24 小時',i:'請以訂位紀錄與航班螢幕的航廈為準。有退稅商品請預留時間辦理退稅與查驗（依各退稅公司規定）。'},
+'아뜰리에8 동묘3':{h:'入住／退房時間請以訂房確認信為準',i:'請把確認信上的韓文地址貼到本頁「住宿資訊」欄，搭計程車時直接給司機看。'}
+};
+
+/* 住宿導航 */
+$('#hotelNav').textContent = '🗺️ NAVER Map 搜尋住宿';
+$('#hotelNav').href = naverUrl('아뜰리에8 동묘3');
+
+/* 地址（可自訂＋複製） */
+const addrInput = $('#addrInput');
+addrInput.value = store.get('addr', '아뜰리에8 동묘3 (동묘앞역 1·6호선 인근)');
+addrInput.addEventListener('input', () => store.set('addr', addrInput.value));
+$('#copyAddr').addEventListener('click', () => {
+  const v = addrInput.value.trim() || '아뜰리에8 동묘3';
+  Promise.resolve(copyText(v)).then(ok => toast(ok ? '已複製韓文地址 ✓' : '複製失敗，請長按輸入框手動複製'));
+});
+
+/* ---------- 日期膠囊＆時間軸 ---------- */
+let curDay = store.get('day', 0);
+(function autoDay(){
+  const now = new Date(), s = new Date(2027,0,11), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const i = Math.round((d0 - s) / 86400000);
+  if(i >= 0 && i <= 4) curDay = i;
+})();
+const doneMap = store.get('done', {});
+function renderPills(){
+  $('#pills').innerHTML = DAYS.map((d,i) =>
+    `<button class="pill ${i===curDay?'active':''}" data-i="${i}"><b>Day ${i+1}</b><span>${d.d}（${d.w}）</span></button>`).join('');
+  $$('.pill').forEach(b => b.addEventListener('click', () => { curDay = +b.dataset.i; store.set('day', curDay); renderPills(); renderDay(); b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }));
+}
+function placeHtml(it){
+  const b = PLACE[it.q] || {};
+  const own = !!(it.h || it.a || (it.m && it.m.length) || it.i);
+  const P = {h:it.h || b.h, a:it.a || b.a, m:(it.m && it.m.length) ? it.m : b.m, i:it.i || b.i};
+  if(!(P.h || P.a || (P.m && P.m.length) || P.i)) return it.custom ? '<div class="tr">💡 想看營業時間／菜單：點下方「Google 地圖」查詢，或按「編輯」補上資料</div>' : '';
+  const foot = own ? '📝 內容為自行輸入' : (b.v ? '✅ 營業時間已與公開資料交叉查證' : '⚠️ 參考資料，時間與價格可能變動，出發前請用 NAVER Map 確認');
+  return `<details class="dt"><summary>📖 店家資訊・營業時間・菜單</summary><div class="dtb">
+    ${P.h?`<p>🕒 <b>營業時間</b>：${esc(P.h)}</p>`:''}
+    ${P.a?`<p>📍 ${esc(P.a)}</p>`:''}
+    ${P.m&&P.m.length?`<p>🍽️ <b>菜單／清單</b></p><ul>${P.m.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${P.i?`<p>ℹ️ ${esc(P.i)}</p>`:''}
+    <p class="vf">${foot}</p></div></details>`;
+}
+function renderDay(){
+  const D = DAYS[curDay];
+  $('#dayTitle').innerHTML = `<h2>${esc(D.title)}</h2><p>${esc(D.sub)}</p>`;
+  $('#timeline').innerHTML = D.items.length ? D.items.map(it => `
+    <div class="tl-item ${doneMap[it.id]?'done':''}" data-k="${it.id}">
+      <div class="dot">${doneMap[it.id]?'✓':''}</div>
+      <div class="tl-card">
+        <div class="tl-top"><span class="time">${esc(it.t)}</span><span class="tag ${it.c}">${CAT[it.c]}</span></div>
+        <h3><span class="ko">${esc(it.ko)}</span>${it.zh?`<small>${esc(it.zh)}</small>`:''}</h3>
+        ${it.hl?`<div class="hl">✦ ${esc(it.hl)}</div>`:''}
+        ${it.tr?`<div class="tr">🚇 ${esc(it.tr)}</div>`:''}
+        ${placeHtml(it)}
+        <div class="acts">
+          <a class="navbtn" target="_blank" rel="noopener" href="${naverUrl(it.q)}">🗺️ NAVER</a>
+          <a class="navbtn gbtn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(it.q)}">Google 地圖</a>
+          <button class="dbtn" data-edit="${it.id}">✏️ 編輯</button><button class="dbtn" data-del="${it.id}">🗑 刪除</button>
+        </div>
+      </div></div>`).join('') : '<div class="empty">這天還沒有行程，按下方「＋ 新增行程」吧</div>';
+  $$('.tl-item .dot').forEach(dot => dot.addEventListener('click', () => {
+    const el = dot.parentElement, k = el.dataset.k;
+    doneMap[k] = !doneMap[k]; store.set('done', doneMap);
+    el.classList.toggle('done', doneMap[k]); dot.textContent = doneMap[k] ? '✓' : '';
+  }));
+  $$('#timeline .dbtn').forEach(b => b.addEventListener('click', () => {
+    const it = DAYS[curDay].items.find(x => x.id === b.dataset.del); if(!it) return;
+    if(!confirm('刪除「' + it.t + ' ' + it.ko + '」？')) return;
+    DAYS[curDay].items = DAYS[curDay].items.filter(x => x.id !== it.id);
+    delete doneMap[it.id]; store.set('done', doneMap); saveDays(); renderDay(); toast('已刪除');
+  }));
+  $$('#timeline [data-edit]').forEach(b => b.addEventListener('click', () => openItemModal(b.dataset.edit)));
+}
+renderPills(); renderDay();
+
+/* ---------- 美食＆購物清單 ---------- */
+const SHOP_CATS = [['all','全部'],['seongsu','聖水洞'],['hongdae','弘大延南洞'],['myeongdong','明洞東大門'],['counter','專櫃美妝']];
+const SHOP_DEFAULT = [];
+const SP = [['xuan','璇'],['li','李實驗'],['huang','黃益聞']];
+const spClone = (arr, p) => arr.map(x => ({...x, id:p+x.id, done:false}));
+let shopAll = store.get('shop4', {xuan:[], li:[], huang:[]});
+let who = store.get('shopWho', 'xuan'), shopFilter = 'all';
+const saveShop = () => store.set('shop4', shopAll);
+$('#shopCat').innerHTML = SHOP_CATS.slice(1).map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+function renderShop(){
+  const shop = shopAll[who] || (shopAll[who] = []);
+  $('#shopWho').innerHTML = SP.map(([id,n]) => {
+    const a = shopAll[id] || [];
+    return `<button data-v="${id}" class="${id===who?'on':''}">${n}<br><small>${a.filter(x=>x.done).length}/${a.length}</small></button>`;
+  }).join('');
+  $$('#shopWho button').forEach(b => b.addEventListener('click', () => { who = b.dataset.v; store.set('shopWho', who); renderShop(); }));
+  $('#shopFilters').innerHTML = SHOP_CATS.map(([v,l]) => `<button class="fbtn ${v===shopFilter?'active':''}" data-v="${v}">${l}</button>`).join('');
+  $$('#shopFilters .fbtn').forEach(b => b.addEventListener('click', () => { shopFilter = b.dataset.v; renderShop(); }));
+  const catName = Object.fromEntries(SHOP_CATS);
+  const list = shop.filter(x => shopFilter === 'all' || x.c === shopFilter);
+  $('#shopList').innerHTML = list.length ? list.map(x => `
+    <div class="ck ${x.done?'done':''}">
+      <input type="checkbox" data-id="${x.id}" ${x.done?'checked':''}>
+      <div class="t"><b>${esc(x.n)}</b>${shopFilter==='all'?`<span class="mini">${catName[x.c]}</span>`:''}${x.note?`<small>${esc(x.note)}</small>`:''}</div>
+      <button class="x" data-del="${x.id}" aria-label="刪除">×</button>
+    </div>`).join('') : '<div class="empty">還沒有項目，從下方新增吧</div>';
+  $$('#shopList input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
+    const it = shop.find(x => x.id === cb.dataset.id); if(it){ it.done = cb.checked; saveShop(); renderShop(); }
+  }));
+  $$('#shopList .x').forEach(b => b.addEventListener('click', () => {
+    if(!confirm('刪除這個項目？')) return;
+    shopAll[who] = shop.filter(x => x.id !== b.dataset.del); saveShop(); renderShop();
+  }));
+  const done = shop.filter(x => x.done).length, name = SP.find(p => p[0] === who)[1];
+  $('#shopBar').style.width = (shop.length ? done/shop.length*100 : 0) + '%';
+  $('#shopCount').textContent = `${name}：已完成 ${done} / ${shop.length} 項`;
+}
+$('#shopAdd').addEventListener('click', () => {
+  const n = $('#shopNew').value.trim(); if(!n) return toast('請先輸入項目名稱');
+  const c = shopFilter === 'all' ? $('#shopCat').value : shopFilter;
+  shopAll[who].push({id:uid(), c, n, note:$('#shopNote').value.trim(), done:false}); saveShop(); $('#shopNew').value = ''; $('#shopNote').value = ''; renderShop();
+  toast('已加入' + SP.find(p => p[0] === who)[1] + '的清單 ✓');
+});
+renderShop();
+
+/* ---------- 行前清單 ---------- */
+const PREP_DEFAULT = [
+ {n:'護照效期 6 個月以上', note:'回程日 2027/01/15 起算，建議效期至 2027/07 以後'},
+ {n:'2027 K-ETA 申請', note:'出發前 72 小時申請，並截圖或列印核准通知'},
+ {n:'SES 快速通關（Smart Entry Service）', note:'台灣出入境可用，提前確認資格'},
+ {n:'Smart Pass', note:'依個人行程準備'},
+ {n:'行動電源與暖暖包隨身攜帶', note:'行動電源貼絕緣膠帶，須放隨身行李'},
+ {n:'220V 圓孔轉接頭', note:'韓國為 220V 雙圓孔插座'},
+ {n:'eSIM', note:'出發前確認已購買與 QR code，抵達後再開啟'},
+ {n:'旅平險', note:'確認保障內容與保單證明'},
+ {n:'氣候同行卡 / T-money', note:'交通儲值卡，抵達機場即可購買或儲值'},
+ {n:'下載 NAVER Map / Papago', note:'離線地圖與翻譯很實用'}
+].map((x,i) => ({id:'p'+i, ...x, done:false}));
+let prep = store.get('prep', PREP_DEFAULT);
+function renderPrep(){
+  $('#prepList').innerHTML = prep.map(x => `
+    <div class="ck ${x.done?'done':''}">
+      <input type="checkbox" data-id="${x.id}" ${x.done?'checked':''}>
+      <div class="t"><b>${esc(x.n)}</b>${x.note?`<small>${esc(x.note)}</small>`:''}</div>
+    </div>`).join('');
+  $$('#prepList input').forEach(cb => cb.addEventListener('change', () => {
+    const it = prep.find(x => x.id === cb.dataset.id); if(it){ it.done = cb.checked; store.set('prep', prep); renderPrep(); }
+  }));
+  const done = prep.filter(x => x.done).length;
+  $('#prepBar').style.width = (prep.length ? done/prep.length*100 : 0) + '%';
+  $('#prepCount').textContent = `已完成 ${done} / ${prep.length} 項`;
+}
+renderPrep();
+
+/* ---------- 匯率換算（KRW per 1 TWD） ---------- */
+let rate = store.get('rate', 45);
+const rateInput = $('#rateInput'), cvKrw = $('#cvKrw'), cvTwd = $('#cvTwd');
+rateInput.value = rate;
+function renderQuick(){
+  $('#quick').innerHTML = [10000, 30000, 50000, 100000].map(k => `<div>₩${fmt(k)}<b>NT$${fmt(k/rate,0)}</b></div>`).join('');
+}
+function setRate(v, msg){
+  if(!(v > 0)) return;
+  rate = v; store.set('rate', rate); rateInput.value = +(+v).toFixed(4); renderQuick(); renderSplit();
+  if(msg) $('#rateMsg').textContent = msg;
+}
+rateInput.addEventListener('input', () => {
+  const v = parseFloat(rateInput.value);
+  if(v > 0){ rate = v; store.set('rate', rate); renderQuick(); renderSplit(); if(cvKrw.value) cvTwd.value = +(cvKrw.value/rate).toFixed(2); }
+});
+cvKrw.addEventListener('input', () => { cvTwd.value = cvKrw.value === '' ? '' : +(cvKrw.value / rate).toFixed(2); });
+cvTwd.addEventListener('input', () => { cvKrw.value = cvTwd.value === '' ? '' : Math.round(cvTwd.value * rate); });
+$('#cvSwap').addEventListener('click', () => { cvKrw.value = ''; cvTwd.value = ''; });
+$('#rateFetch').addEventListener('click', () => {
+  $('#rateMsg').textContent = '查詢中…';
+  fetch('https://open.er-api.com/v6/latest/TWD').then(r => r.json()).then(d => {
+    const v = d && d.rates && d.rates.KRW;
+    if(!v) throw 0;
+    setRate(v, `已更新：1 TWD ≈ ${v.toFixed(2)} KRW（${new Date().toLocaleString('zh-TW',{hour12:false})}）`);
+    toast('匯率已更新 ✓');
+  }).catch(() => { $('#rateMsg').textContent = '無法取得即時匯率，請手動輸入（目前使用自訂匯率）'; });
+});
+$('#rateMsg').textContent = '預設 1 TWD ≈ 45 KRW；可手動修改，或按「抓即時匯率」。';
+renderQuick();
+
+/* ---------- 韓文手指卡 ---------- */
+const PHRASES = [
+ ['請帶我去這個地址','이 주소로 가 주세요.','i juso-ro ga juseyo'],
+ ['請問洗手間在哪裡？','화장실이 어디예요?','hwajangsiri eodiyeyo?'],
+ ['請問地鐵站在哪裡？','지하철역이 어디예요?','jihacheolyeogi eodiyeyo?'],
+ ['我要這個','이거 주세요.','igeo juseyo'],
+ ['這個多少錢？','이거 얼마예요?','igeo eolmayeyo?'],
+ ['兩位','두 명이에요.','du myeong-ieyo'],
+ ['請給我水','물 좀 주세요.','mul jom juseyo'],
+ ['請不要太辣','맵지 않게 해 주세요.','maepji anke hae juseyo'],
+ ['外帶','포장해 주세요.','pojanghae juseyo'],
+ ['可以刷卡嗎？','카드 돼요?','kadeu dwaeyo?'],
+ ['可以退稅嗎？','택스리펀 돼요?','taekseu-ripeon dwaeyo?'],
+ ['有中文菜單嗎？','중국어 메뉴판 있어요?','jungugeo menyupan isseoyo?'],
+ ['可以幫我們拍照嗎？','사진 좀 찍어 주세요.','sajin jom jjigeo juseyo'],
+ ['謝謝，辛苦了','감사합니다.','gamsahamnida'],
+];
+$('#phrases').innerHTML = PHRASES.map((p,i) => `<button class="ph" data-i="${i}"><div class="z">${esc(p[0])}</div><div class="k">${esc(p[1])}</div></button>`).join('');
+$$('.ph').forEach(b => b.addEventListener('click', () => {
+  const p = PHRASES[+b.dataset.i];
+  $('#oz').textContent = p[0]; $('#ok').textContent = p[1]; $('#or').textContent = p[2];
+  $('#overlay').classList.add('show');
+}));
+$('#overlay').addEventListener('click', () => $('#overlay').classList.remove('show'));
+
+/* ---------- 三人分帳 ---------- */
+const PEOPLE = [{id:'xuan', name:'璇'}, {id:'li', name:'李實驗'}, {id:'huang', name:'黃益聞'}];
+const pname = id => (PEOPLE.find(p => p.id === id) || {name:id}).name;
+let expenses = store.get('expenses3', []);
+let payer = 'xuan';
+let sharers = PEOPLE.map(p => p.id);
+
+function renderForm(){
+  $('#exPayer').innerHTML = PEOPLE.map(p => `<button data-v="${p.id}" class="${p.id===payer?'on':''}">${esc(p.name)}</button>`).join('');
+  $('#exShare').innerHTML = PEOPLE.map(p => `<button data-v="${p.id}" class="${sharers.includes(p.id)?'on':''}">${esc(p.name)}</button>`).join('');
+  $$('#exPayer button').forEach(b => b.addEventListener('click', () => { payer = b.dataset.v; renderForm(); }));
+  $$('#exShare button').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.v;
+    if(sharers.includes(id)){
+      if(sharers.length === 1) return toast('至少要有一位分攤的人');
+      sharers = sharers.filter(x => x !== id);
+    } else sharers.push(id);
+    renderForm();
+  }));
+}
+
+const toKrw = e => e.cur === 'KRW' ? e.amt : e.amt * rate;
+const toTwd = e => e.cur === 'TWD' ? e.amt : e.amt / rate;
+
+function calcSettle(bal){
+  const cr = PEOPLE.map(p => ({id:p.id, v:bal[p.id]})).filter(x => x.v > 0.5).sort((a,b) => b.v - a.v);
+  const db = PEOPLE.map(p => ({id:p.id, v:-bal[p.id]})).filter(x => x.v > 0.5).sort((a,b) => b.v - a.v);
+  const out = []; let i = 0, j = 0;
+  while(i < db.length && j < cr.length){
+    const m = Math.min(db[i].v, cr[j].v);
+    out.push({from:db[i].id, to:cr[j].id, amt:m});
+    db[i].v -= m; cr[j].v -= m;
+    if(db[i].v < 0.5) i++;
+    if(cr[j].v < 0.5) j++;
+  }
+  return out;
+}
+
+function renderSplit(){
+  const paid = {}, owe = {}, bal = {};
+  PEOPLE.forEach(p => { paid[p.id] = 0; owe[p.id] = 0; });
+  let totKrw = 0, totTwd = 0;
+  expenses.forEach(e => {
+    const t = toTwd(e), k = toKrw(e);
+    totTwd += t; totKrw += k;
+    paid[e.payer] = (paid[e.payer] || 0) + t;
+    const sh = (e.sharers && e.sharers.length) ? e.sharers : PEOPLE.map(p => p.id);
+    sh.forEach(id => { owe[id] = (owe[id] || 0) + t / sh.length; });
+  });
+  PEOPLE.forEach(p => { bal[p.id] = paid[p.id] - owe[p.id]; });
+
+  $('#sTotTwd').textContent = 'NT$' + fmt(totTwd);
+  $('#sTotKrw').textContent = '₩' + fmt(totKrw);
+
+  $('#perPerson').innerHTML = PEOPLE.map(p => {
+    const b = bal[p.id];
+    const label = b >= 0.5 ? '應收 NT$' + fmt(b) : b <= -0.5 ? '應付 NT$' + fmt(-b) : '已平衡';
+    const cls = b >= 0.5 ? 'pos' : b <= -0.5 ? 'neg' : '';
+    return `<div class="pp"><b>${esc(p.name)}</b><span>先付 NT$${fmt(paid[p.id])}｜應分攤 NT$${fmt(owe[p.id])}</span><em class="${cls}">${label}</em></div>`;
+  }).join('');
+
+  const box = $('#settle');
+  if(!expenses.length) box.innerHTML = '還沒有支出';
+  else {
+    const out = calcSettle(bal);
+    box.innerHTML = out.length
+      ? '<div style="font-size:12.5px;opacity:.8;margin-bottom:4px">最終結算（最少轉帳筆數）</div>' + out.map(o =>
+          `<div class="pay"><b>${esc(pname(o.from))}</b> → 要給 <b>${esc(pname(o.to))}</b><div class="big2">NT$${fmt(o.amt)} ≈ ₩${fmt(o.amt * rate)}</div></div>`).join('')
+      : '🎉 大家剛好平衡，不需要轉帳';
+  }
+
+  $('#exList').innerHTML = expenses.length ? expenses.slice().reverse().map(e => {
+    const sh = (e.sharers && e.sharers.length) ? e.sharers : PEOPLE.map(p => p.id);
+    const all = sh.length === PEOPLE.length;
+    const each = toTwd(e) / sh.length;
+    const amtTxt = e.cur === 'KRW' ? '₩' + fmt(e.amt) + ' ≈ NT$' + fmt(e.amt / rate) : 'NT$' + fmt(e.amt) + ' ≈ ₩' + fmt(e.amt * rate);
+    return `<div class="exp-item">
+      <div class="grow"><b>${esc(e.desc)}</b>
+        <div class="muted">${amtTxt}</div>
+        <div class="muted">${esc(pname(e.payer))} 先付｜${all ? '三人平分' : '分攤：' + sh.map(pname).map(esc).join('、')}（每人 NT$${fmt(each)}）</div>
+      </div>
+      <button class="x" style="border:none;background:none;color:#C9B9A5;font-size:20px;cursor:pointer" data-del="${e.id}" aria-label="刪除">×</button>
+    </div>`;
+  }).join('') : '<div class="empty">尚無支出，開始記帳吧 ✎</div>';
+  $$('#exList [data-del]').forEach(b => b.addEventListener('click', () => {
+    expenses = expenses.filter(e => e.id !== b.dataset.del); store.set('expenses3', expenses); renderSplit();
+  }));
+}
+
+$('#exAdd').addEventListener('click', () => {
+  const desc = $('#exDesc').value.trim() || '未命名支出';
+  const amt = parseFloat($('#exAmt').value);
+  if(!(amt > 0)) return toast('請輸入正確金額');
+  expenses.push({id:uid(), desc, amt, cur:$('#exCur').value, payer, sharers:sharers.slice()});
+  store.set('expenses3', expenses);
+  $('#exDesc').value = ''; $('#exAmt').value = '';
+  sharers = PEOPLE.map(p => p.id); renderForm();
+  renderSplit(); toast('已新增支出 ✓');
+});
+$('#exClear').addEventListener('click', () => {
+  if(!expenses.length) return;
+  if(confirm('確定清除所有支出紀錄？此動作無法復原。')){ expenses = []; store.set('expenses3', expenses); renderSplit(); }
+});
+renderForm();
+renderSplit();
+
+
+/* ---------- 新增行程（跳出視窗填時間＋內容） ---------- */
+const modal = $('#modal'); let editId = null;
+const F = {t:'#mTime', c:'#mCat', ko:'#mName', zh:'#mZh', hl:'#mHl', tr:'#mTr', h:'#mHours', a:'#mAddr', m:'#mMenu', i:'#mNote', q:'#mQ'};
+function openItemModal(id){
+  editId = id || null;
+  const it = id ? DAYS[curDay].items.find(x => x.id === id) : null;
+  $('#mTitle').textContent = `Day ${curDay+1}（${DAYS[curDay].d}）｜${it ? '編輯' : '新增'}行程`;
+  $('#mOk').textContent = it ? '儲存修改' : '加入行程';
+  Object.entries(F).forEach(([k, sel]) => {
+    let v = it ? it[k] : '';
+    if(k === 'm') v = (v || []).join('\n');
+    if(k === 'c') v = v || 'exp';
+    if(k === 'q' && it && it.q === it.ko) v = '';
+    $(sel).value = v == null ? '' : v;
+  });
+  modal.classList.add('show'); modal.querySelector('.sheet').scrollTop = 0;
+}
+$('#addItem').addEventListener('click', () => openItemModal());
+$('#mCancel').addEventListener('click', () => modal.classList.remove('show'));
+modal.addEventListener('click', e => { if(e.target === modal) modal.classList.remove('show'); });
+$('#mOk').addEventListener('click', () => {
+  const g = k => $(F[k]).value.trim();
+  if(!g('t')) return toast('請填入時間');
+  if(!g('ko')) return toast('請填入行程名稱');
+  const data = {t:g('t'), c:$('#mCat').value, ko:g('ko'), zh:g('zh'), hl:g('hl'), tr:g('tr'), h:g('h'), a:g('a'),
+    m:g('m').split('\n').map(x => x.trim()).filter(Boolean), i:g('i'), q:g('q') || g('ko'), custom:true};
+  const D = DAYS[curDay];
+  if(editId){ const it = D.items.find(x => x.id === editId); if(it) Object.assign(it, data); }
+  else D.items.push({id:uid(), ...data});
+  D.items.sort((a,b) => a.t.localeCompare(b.t));
+  saveDays(); modal.classList.remove('show'); renderDay(); toast(editId ? '已儲存修改 ✓' : '已加入行程 ✓');
+});
+$('#editDay').addEventListener('click', () => {
+  const D = DAYS[curDay];
+  const t = prompt('這天的標題（例：Day 2｜聖水洞）', D.title); if(t === null) return;
+  const s = prompt('一句話說明（可空白）', D.sub);
+  D.title = t.trim() || D.title; if(s !== null) D.sub = s.trim();
+  saveDays(); renderDay();
+});
+$('#resetDay').addEventListener('click', () => {
+  if(!confirm('清空「' + DAYS[curDay].title + '」的所有行程？此動作無法復原。')) return;
+  DAYS[curDay] = JSON.parse(JSON.stringify(DAYS0[curDay])); saveDays(); renderDay();
+});
+
+/* ---------- 行李清單 ---------- */
+const PACK_CATS = [['all','全部'],['doc','證件・錢'],['cloth','衣物'],['warm','保暖'],['tech','3C'],['care','盥洗保養'],['med','藥品'],['misc','雜物']];
+const PACK_DEFAULT = [
+ ['doc','護照','效期 6 個月以上；拍照存手機備份'],['doc','K-ETA 核准截圖'],['doc','電子機票／登機證','OZ714 / OZ713'],
+ ['doc','住宿確認信（含韓文地址）'],['doc','信用卡＋韓元現金','刷卡海外手續費較低的卡'],['doc','旅平險證明'],
+ ['cloth','發熱衣 ×3'],['cloth','毛衣／針織 ×2～3'],['cloth','長版羽絨外套','1 月約 -7～2°C'],['cloth','發熱褲／刷毛內搭褲'],
+ ['cloth','厚襪 ×4～5'],['cloth','防滑短靴','鞋底防滑，結冰路面很重要'],['cloth','睡衣・內衣褲（多帶 1 套）'],['cloth','室內穿的薄長袖','暖氣很強，洋蔥式穿法'],
+ ['warm','毛帽'],['warm','手套','可觸控螢幕更方便'],['warm','圍巾'],['warm','暖暖包','貼式＋握式，每人 10 片以上'],
+ ['tech','手機＋充電線'],['tech','行動電源','隨身手提，不可托運'],['tech','220V 轉接頭／USB 充電頭','韓國為雙圓孔插座'],
+ ['tech','eSIM QR code 截圖'],['tech','耳機'],['tech','相機＋記憶卡','可選'],
+ ['care','牙刷牙膏','旅館不一定提供'],['care','洗面乳・卸妝'],['care','保濕乳液・護手霜・護唇膏','冬天非常乾'],['care','隱形眼鏡／眼鏡'],['care','髮圈・梳子'],['care','衛生用品'],
+ ['med','個人常備藥'],['med','感冒藥・止痛藥・腸胃藥'],['med','OK 繃・痠痛貼布','走路很多'],
+ ['misc','折疊大購物袋','血拼用'],['misc','行李秤／束帶'],['misc','夾鏈袋・塑膠袋'],['misc','折疊傘','雪或雨都可用'],
+ ['misc','濕紙巾・面紙'],['misc','隨身小包','護照貼身放'],['misc','預留回程空間','行李箱至少留 1/3']
+].map(([c,n,note],i) => ({id:'k'+i, c, n, note:note||'', done:false}));
+let pack = store.get('pack', PACK_DEFAULT), packF = 'all';
+$('#packCat').innerHTML = PACK_CATS.slice(1).map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+function renderPack(){
+  $('#packFilters').innerHTML = PACK_CATS.map(([v,l]) => `<button class="fbtn ${v===packF?'active':''}" data-v="${v}">${l}</button>`).join('');
+  $$('#packFilters .fbtn').forEach(b => b.addEventListener('click', () => { packF = b.dataset.v; renderPack(); }));
+  const cn = Object.fromEntries(PACK_CATS);
+  const list = pack.filter(x => packF === 'all' || x.c === packF);
+  $('#packList').innerHTML = list.length ? list.map(x => `
+    <div class="ck ${x.done?'done':''}">
+      <input type="checkbox" data-id="${x.id}" ${x.done?'checked':''}>
+      <div class="t"><b>${esc(x.n)}</b>${packF==='all'?`<span class="mini">${cn[x.c]}</span>`:''}${x.note?`<small>${esc(x.note)}</small>`:''}</div>
+      <button class="x" data-del="${x.id}" aria-label="刪除">×</button>
+    </div>`).join('') : '<div class="empty">這個分類還沒有物品</div>';
+  $$('#packList input').forEach(cb => cb.addEventListener('change', () => {
+    const it = pack.find(x => x.id === cb.dataset.id); if(it){ it.done = cb.checked; store.set('pack', pack); renderPack(); }
+  }));
+  $$('#packList .x').forEach(b => b.addEventListener('click', () => {
+    if(!confirm('刪除這個物品？')) return;
+    pack = pack.filter(x => x.id !== b.dataset.del); store.set('pack', pack); renderPack();
+  }));
+  const done = pack.filter(x => x.done).length;
+  $('#packBar').style.width = (pack.length ? done/pack.length*100 : 0) + '%';
+  $('#packCount').textContent = `已打包 ${done} / ${pack.length} 項`;
+}
+$('#packAdd').addEventListener('click', () => {
+  const n = $('#packNew').value.trim(); if(!n) return toast('請先輸入物品名稱');
+  pack.push({id:uid(), c: packF==='all' ? $('#packCat').value : packF, n, note:'', done:false});
+  store.set('pack', pack); $('#packNew').value = ''; renderPack(); toast('已加入行李清單 ✓');
+});
+$('#packReset').addEventListener('click', () => {
+  if(!confirm('取消所有勾選？')) return;
+  pack.forEach(x => x.done = false); store.set('pack', pack); renderPack();
+});
+renderPack();
+
+/* ---------- 還原上次分頁 ---------- */
+(function(){
+  const last = store.get('tab', 'p-trip');
+  const b = document.querySelector(`.tab[data-p="${last}"]`);
+  if(b) b.click();
+})();
+</script>
+</body>
+</html>
